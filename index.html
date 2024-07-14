@@ -4,83 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photo Pose Wheel</title>
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to bottom right, #8a2be2, #ff69b4, #ff4500);
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            max-width: 300px;
+            width: 100%;
+        }
+        h1 {
+            color: white;
+        }
+        .wheel {
+            width: 200px;
+            height: 200px;
+            border: 8px solid white;
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .wheel::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 20px;
+            background-color: yellow;
+        }
+        .pose {
+            color: white;
+            height: 60px;
+            margin: 20px 0;
+        }
+        button {
+            background-color: white;
+            color: #8a2be2;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #f0f0f0;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
-        // Pasteimport React, { useState, useEffect } from 'react';
-import { Camera, RotateCcw } from 'lucide-react';
-
-const poses = [
-  "Living Art Gallery: Recreate a famous painting or sculpture",
-  "Piggyback Ride: One partner jumps on the other's back",
-  "Chin Rest: Rest your chin on your partner's shoulder or head",
-  "Over-the-Shoulder Look: Look over your partner's shoulder at the camera",
-  "Hand-on-Cheek: Place your hand on your partner's cheek and stare into their eyes",
-  "Evolution of Your Relationship: Create a series of poses representing different relationship stages",
-  "Emotion Roulette: Express a random emotion together",
-  "A Day in Our Life: Pose scenes from your typical day together",
-  "Silhouette Challenge: Create interesting silhouettes against a backlight",
-  "Mirroring Exercise: Mirror each other's movements and expressions",
-  "Shadow Play: Create artistic shadows on the wall",
-  "Opposite Day: Switch your usual roles in common activities"
-];
-
-export default function StylishPhotoPoseWheel() {
-  const [spinning, setSpinning] = useState(false);
-  const [selectedPose, setSelectedPose] = useState('');
-  const [rotation, setRotation] = useState(0);
-
-  const spinWheel = () => {
-    if (!spinning) {
-      setSpinning(true);
-      setSelectedPose('');
-      const newRotation = rotation + 1440 + Math.random() * 360;
-      setRotation(newRotation);
-      
-      setTimeout(() => {
-        setSpinning(false);
-        const index = Math.floor(Math.random() * poses.length);
-        setSelectedPose(poses[index]);
-      }, 5000);
-    }
-  };
-
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 p-4">
-      <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-3xl shadow-2xl p-8 max-w-md w-full">
-        <h1 className="text-4xl font-bold mb-8 text-white text-center flex items-center justify-center">
-          <Camera className="mr-2" /> Photo Pose Wheel
-        </h1>
-        <div className="relative w-64 h-64 mx-auto mb-8">
-          <div 
-            className="w-full h-full rounded-full border-8 border-white flex items-center justify-center transition-all duration-5000 ease-in-out"
-            style={{ transform: `rotate(${rotation}deg)` }}
-          >
-            <RotateCcw size={48} className="text-white" />
-          </div>
-          <div className="absolute top-0 left-1/2 w-1 h-16 bg-yellow-300 -ml-0.5 rounded-b-full shadow-lg"></div>
-        </div>
-        <div className="h-24 flex items-center justify-center">
-          <p className="text-xl text-center text-white font-semibold">
-            {spinning ? "Finding your next pose..." : (selectedPose || "Spin the wheel for your next pose!")}
-          </p>
-        </div>
-        <button
-          onClick={spinWheel}
-          disabled={spinning}
-          className={`w-full ${spinning ? 'bg-gray-400 cursor-not-allowed' : 'bg-white text-purple-600 hover:bg-purple-100'} font-bold py-3 px-4 rounded-full transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50`}
-        >
-          {spinning ? "Choosing pose..." : "Spin for a Pose"}
-        </button>
-      </div>
+    <div class="container">
+        <h1>Photo Pose Wheel</h1>
+        <div class="wheel" id="wheel"></div>
+        <div class="pose" id="pose">Spin the wheel for your next pose!</div>
+        <button id="spinButton">Spin for a Pose</button>
     </div>
-  );
-} 
+
+    <script>
+        const poses = [
+            "Living Art Gallery: Recreate a famous painting or sculpture",
+            "Piggyback Ride: One partner jumps on the other's back",
+            "Chin Rest: Rest your chin on your partner's shoulder or head",
+            "Over-the-Shoulder Look: Look over your partner's shoulder at the camera",
+            "Hand-on-Cheek: Place your hand on your partner's cheek and stare into their eyes",
+            "Evolution of Your Relationship: Create a series of poses representing different relationship stages",
+            "Emotion Roulette: Express a random emotion together",
+            "A Day in Our Life: Pose scenes from your typical day together",
+            "Silhouette Challenge: Create interesting silhouettes against a backlight",
+            "Mirroring Exercise: Mirror each other's movements and expressions",
+            "Shadow Play: Create artistic shadows on the wall",
+            "Opposite Day: Switch your usual roles in common activities"
+        ];
+
+        const wheel = document.getElementById('wheel');
+        const poseElement = document.getElementById('pose');
+        const spinButton = document.getElementById('spinButton');
+        let spinning = false;
+
+        spinButton.addEventListener('click', spinWheel);
+
+        function spinWheel() {
+            if (spinning) return;
+            spinning = true;
+            spinButton.disabled = true;
+            poseElement.textContent = "Finding your next pose...";
+
+            const rotation = 1440 + Math.random() * 360;
+            wheel.style.transform = `rotate(${rotation}deg)`;
+
+            setTimeout(() => {
+                spinning = false;
+                spinButton.disabled = false;
+                const randomPose = poses[Math.floor(Math.random() * poses.length)];
+                poseElement.textContent = randomPose;
+            }, 5000);
+        }
     </script>
 </body>
 </html>
